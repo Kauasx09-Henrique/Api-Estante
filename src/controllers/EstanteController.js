@@ -3,7 +3,6 @@ const db = require('../config/db');
 module.exports = {
     async index(req, res) {
         try {
-            // AJUSTE AQUI: Adicionei "AS livro_isbn" para bater com o frontend
             const result = await db.query(
                 `SELECT e.id, e.pagina_atual, e.status, e.avaliacao, 
                         l.isbn AS livro_isbn, l.titulo, l.url_capa, l.total_paginas 
@@ -21,7 +20,6 @@ module.exports = {
     async store(req, res) {
         const { livro_isbn, status, avaliacao, titulo, url_capa, total_paginas } = req.body;
         try {
-            // Salva ou atualiza o livro no catálogo global
             await db.query(
                 `INSERT INTO livros (isbn, titulo, url_capa, total_paginas) 
                  VALUES ($1, $2, $3, $4) 
@@ -29,7 +27,6 @@ module.exports = {
                 [livro_isbn, titulo, url_capa, total_paginas]
             );
 
-            // Vincula ao usuário
             const result = await db.query(
                 `INSERT INTO estante (utilizador_id, livro_isbn, status, avaliacao) 
                  VALUES ($1, $2, $3, $4) RETURNING *`,
@@ -42,7 +39,6 @@ module.exports = {
         }
     },
 
-    // AQUI ESTÁ A MÁGICA QUE FALTAVA PARA O BOTÃO SALVAR:
     async update(req, res) {
         const { id } = req.params;
         const { pagina_atual, status, avaliacao } = req.body;
@@ -54,15 +50,14 @@ module.exports = {
                  WHERE id = $4 AND utilizador_id = $5 RETURNING *`,
                 [pagina_atual, status, avaliacao, id, req.userId]
             );
-            
-            // Se não encontrou o registro (result.rows vazio), é porque não pertence ao usuário ou ID errado
+
             if (result.rows.length === 0) {
-                 return res.status(404).json({ error: 'Livro não encontrado na sua estante.' });
+                return res.status(404).json({ error: 'Livro não encontrado na sua estante.' });
             }
 
             return res.json(result.rows[0]);
         } catch (err) {
-            console.error(err); // Importante para debug
+            console.error(err);
             return res.status(400).json({ error: 'Erro ao atualizar' });
         }
     },

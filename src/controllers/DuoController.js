@@ -1,7 +1,6 @@
 const db = require('../config/db');
 
 module.exports = {
-    // 1. LISTAR (index)
     async index(req, res) {
         const { userId } = req;
         try {
@@ -22,7 +21,6 @@ module.exports = {
         }
     },
 
-    // 2. DETALHES (show)
     async show(req, res) {
         const { id } = req.params;
         try {
@@ -41,7 +39,6 @@ module.exports = {
                 [leitura.usuario_id_2, leitura.livro_isbn]
             );
 
-            // Busca comentários ordenados
             const comentarios = await db.query(
                 `SELECT c.*, u.nome_utilizador, u.url_avatar 
                  FROM comentarios_leitura c
@@ -63,14 +60,11 @@ module.exports = {
         }
     },
 
-    // 3. CRIAR OU RECUPERAR (store) - AQUI ESTÁ A CORREÇÃO!
     async store(req, res) {
         const { userId } = req;
         const { amigo_id, livro_isbn, titulo, url_capa, total_paginas } = req.body;
 
         try {
-            // VERIFICAÇÃO INTELIGENTE:
-            // "Já existe uma sala para esse livro entre esses dois usuários?"
             const existingDuo = await db.query(
                 `SELECT * FROM leituras_conjuntas 
                  WHERE livro_isbn = $1 
@@ -82,13 +76,10 @@ module.exports = {
                 [livro_isbn, userId, amigo_id]
             );
 
-            // SE JÁ EXISTE, NÃO CRIA OUTRA! Retorna a sala antiga com as mensagens antigas.
             if (existingDuo.rows.length > 0) {
                 return res.json(existingDuo.rows[0]);
             }
 
-            // SE NÃO EXISTE, CRIA UMA NOVA
-            // Antes, garante que o amigo tenha o livro na estante
             const checkFriend = await db.query(
                 'SELECT * FROM estante WHERE utilizador_id = $1 AND livro_isbn = $2',
                 [amigo_id, livro_isbn]
@@ -116,7 +107,6 @@ module.exports = {
         }
     },
 
-    // 4. COMENTAR (addComment)
     async addComment(req, res) {
         const { userId } = req;
         const { id } = req.params;
@@ -135,7 +125,6 @@ module.exports = {
         }
     },
 
-    // 5. ATUALIZAR PROGRESSO (updateProgress)
     async updateProgress(req, res) {
         const { userId } = req;
         const { id } = req.params;

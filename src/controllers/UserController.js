@@ -1,22 +1,19 @@
-const db = require('../config/db'); // Sua conexão com o banco
+const db = require('../config/db'); 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 
 module.exports = {
-    // --- LOGIN E REGISTRO (Mantidos) ---
     async register(req, res) {
         const { nome_utilizador, email, senha } = req.body;
         try {
-            // Verifica se email já existe
             const userExists = await db.query('SELECT * FROM utilizadores WHERE email = $1', [email]);
             if (userExists.rows.length > 0) {
                 return res.status(400).json({ error: 'Email já cadastrado.' });
             }
 
             const hash = await bcrypt.hash(senha, 10);
-            // URL de avatar padrão (iniciais) se não for enviado
             const defaultAvatar = `https://ui-avatars.com/api/?name=${nome_utilizador}&background=0F172A&color=fff`;
 
             const result = await db.query(
@@ -25,7 +22,7 @@ module.exports = {
             );
 
             const user = result.rows[0];
-            delete user.senha_hash; // Não devolva a senha
+            delete user.senha_hash; 
 
             const token = jwt.sign({ id: user.id }, process.env.SECRET, { expiresIn: '7d' });
             return res.status(201).json({ user, token });
@@ -54,9 +51,8 @@ module.exports = {
         }
     },
 
-    // --- NOVO: PEGAR DADOS DO PERFIL (SHOW) ---
     async show(req, res) {
-        // req.userId vem do seu middleware de autenticação
+        
         const { userId } = req; 
         try {
             const result = await db.query('SELECT id, nome_utilizador, email, url_avatar FROM utilizadores WHERE id = $1', [userId]);
@@ -68,25 +64,21 @@ module.exports = {
         }
     },
 
-    // --- NOVO: ATUALIZAR DADOS (UPDATE) ---
     async update(req, res) {
-        const { userId } = req; // ID vindo do token JWT
+        const { userId } = req; 
         const { nome_utilizador, email, senha } = req.body;
 
         try {
-            // Busca usuário atual
             const userQuery = await db.query('SELECT * FROM utilizadores WHERE id = $1', [userId]);
             const user = userQuery.rows[0];
             if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
 
             let newHash = user.senha_hash;
 
-            // Se o usuário mandou uma nova senha, criptografa ela
             if (senha) {
                 newHash = await bcrypt.hash(senha, 10);
             }
 
-            // Atualiza no banco
             const updateQuery = await db.query(
                 `UPDATE utilizadores 
                  SET nome_utilizador = $1, email = $2, senha_hash = $3 
@@ -110,16 +102,13 @@ module.exports = {
         }
 
         try {
-            // --- ATENÇÃO AQUI ---
-            // Troque '192.168.X.X' pelo SEU IP que você pegou no ipconfig
-            // Mantenha o :3000 (ou a porta que seu servidor usa)
-            const meuIp = '192.168.1.10'; // <--- COLOQUE SEU IP AQUI (Ex: 192.168.0.15)
+          
+            const meuIp = '192.168.1.10'; 
             
             const avatarUrl = `http://${meuIp}:3000/uploads/${req.file.filename}`;
 
-            console.log("Salvando Avatar com URL:", avatarUrl); // Log para conferir
+            console.log("Salvando Avatar com URL:", avatarUrl); 
 
-            // Atualiza no banco
             const result = await db.query(
                 'UPDATE utilizadores SET url_avatar = $1 WHERE id = $2 RETURNING *',
                 [avatarUrl, userId]

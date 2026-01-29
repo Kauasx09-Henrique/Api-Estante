@@ -48,6 +48,6 @@ routes.post('/duo', DuoController.store);
 routes.post('/duo/:id/comentarios', DuoController.addComment);
 routes.put('/duo/:id/progress', DuoController.updateProgress);
 
-console.log("--> ROTA DE RANKING FOI REGISTRADA!"); // <--- Adicione isso para testar
+console.log("--> ROTA DE RANKING FOI REGISTRADA!"); 
 routes.get('/ranking', RankingController.index);
 module.exports = routes;
