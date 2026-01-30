@@ -54,7 +54,7 @@ A API segue o padrão MVC (Model-View-Controller) adaptado para API REST:
 Abaixo está o diagrama relacional que ilustra como as tabelas se conectam para permitir a gamificação e o sistema de leitura em dupla.
 
 <div align="center">
-  <img src="./assets/modelagem.png" alt="Diagrama Entidade Relacionamento do Marcador" width="100%">
+  <img src="/modelagem.png" alt="Diagrama Entidade Relacionamento do Marcador" width="100%">
 </div>
 
 ### 📜 Scripts SQL
