@@ -50,6 +50,14 @@ A API segue o padrão MVC (Model-View-Controller) adaptado para API REST:
 
 ## 🗄️ Banco de Dados
 
+### 📐 Modelagem de Dados (DER)
+Abaixo está o diagrama relacional que ilustra como as tabelas se conectam para permitir a gamificação e o sistema de leitura em dupla.
+
+<div align="center">
+  <img src="./assets/modelagem.png" alt="Diagrama Entidade Relacionamento do Marcador" width="100%">
+</div>
+
+### 📜 Scripts SQL
 Para rodar o projeto, você precisa criar um banco de dados PostgreSQL e executar as seguintes queries para estruturar as tabelas:
 
 ```sql
